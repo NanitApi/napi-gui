@@ -21,11 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class ItemSerializer {
+public class ItemParser {
 
     private MethodHandle getMatIdMethod;
 
-    public ItemSerializer() {
+    public ItemParser() {
         try {
             Method getMatId = Material.class.getMethod("getMaterial", int.class);
             getMatIdMethod = MethodHandles.lookup().unreflect(getMatId);
@@ -34,7 +34,7 @@ public class ItemSerializer {
         }
     }
 
-    public ItemStack deserialize(Map<String, Object> map) throws Exception {
+    public ItemStack parse(Map<String, Object> map) throws Exception {
         Material type = getMaterial(map.get("type"));
         byte data = (byte) map.getOrDefault("data", 0);
         int amount = (int) map.getOrDefault("amount", 1);
@@ -145,15 +145,6 @@ public class ItemSerializer {
             str = str.substring(1);
             int rgb = Integer.parseInt(str, 16);
             return Color.fromRGB(rgb);
-        }
-
-        String[] rgbArr = str.split(",");
-
-        if(rgbArr.length == 3) {
-            int r = Integer.parseInt(rgbArr[0].trim());
-            int g = Integer.parseInt(rgbArr[1].trim());
-            int b = Integer.parseInt(rgbArr[2].trim());
-            return Color.fromRGB(r, g, b);
         }
 
         return DyeColor.valueOf(color).getColor();

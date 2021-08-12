@@ -6,6 +6,10 @@ package napi.gui.api.action;
 @FunctionalInterface
 public interface Action {
 
+    /**
+     * Execute this action
+     * @param ctx GUI action context
+     */
     void execute(ActionContext ctx);
 
 }

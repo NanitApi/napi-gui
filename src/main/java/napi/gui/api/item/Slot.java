@@ -1,4 +1,4 @@
-package napi.gui.api.inventory;
+package napi.gui.api.item;
 
 import java.util.function.Consumer;
 

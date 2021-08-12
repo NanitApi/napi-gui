@@ -1,6 +1,6 @@
 package napi.gui.slot;
 
-import napi.gui.api.inventory.Slot;
+import napi.gui.api.item.Slot;
 
 import java.util.function.Consumer;
 
