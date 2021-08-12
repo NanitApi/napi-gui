@@ -1,0 +1,3 @@
+name: "GuiExample"
+main: "napi.gui.example.Main"
+version: "1.0"
