@@ -46,7 +46,7 @@ public interface Window extends InventoryHolder {
     /**
      * Close this window for player who opened it
      */
-    void close();
+    void close(Player player);
 
     /**
      * Process inventory click

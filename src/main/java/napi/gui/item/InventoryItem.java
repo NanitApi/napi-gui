@@ -12,11 +12,13 @@ public class InventoryItem implements Item {
     private final Slot slot;
     private final Action action;
     private ItemStack stack;
+    private boolean fixed;
 
-    InventoryItem(Slot slot, ItemStack stack, Action action) {
+    InventoryItem(Slot slot, ItemStack stack, Action action, boolean fixed) {
         this.slot = slot;
         this.stack = stack;
         this.action = action;
+        this.fixed = fixed;
     }
 
     @Override
@@ -32,6 +34,16 @@ public class InventoryItem implements Item {
     @Override
     public Optional<Action> action() {
         return Optional.ofNullable(action);
+    }
+
+    @Override
+    public boolean isFixed() {
+        return fixed;
+    }
+
+    @Override
+    public void fixed(boolean fixed) {
+        this.fixed = fixed;
     }
 
     @Override

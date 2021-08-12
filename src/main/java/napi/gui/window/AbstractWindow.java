@@ -8,6 +8,7 @@ import napi.gui.api.item.Item;
 import napi.gui.api.item.ItemsList;
 import napi.gui.api.item.Slot;
 import org.bukkit.Bukkit;
+import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.Inventory;
@@ -19,8 +20,6 @@ public abstract class AbstractWindow implements Window {
     private final Controller controller;
     private final Inventory inventory;
     private final ItemsList items;
-
-    private Player player;
 
     public AbstractWindow(Template template) {
         this.template = template;
@@ -51,33 +50,46 @@ public abstract class AbstractWindow implements Window {
 
     @Override
     public void open(Player player) {
-        this.player = player;
         controller.onWindowOpen(this, player);
-        player.getOpenInventory();
+        redraw();
         player.openInventory(inventory);
         controller.onWindowOpened(this, player);
     }
 
     @Override
-    public void close() {
-        if (player != null) {
-            try {
-                player.closeInventory();
-            } catch (Throwable t) { /* Ignore */ }
-            controller.onWindowClosed(this, player);
-        }
+    public void close(Player player) {
+        player.closeInventory();
     }
 
     @Override
     public void click(InventoryClickEvent event) {
-        Player clicker = (Player) event.getWhoClicked();
-        Item item = items().get(event.getSlot());
-        ActionContext ctx = new ActionContext(event.getClick(), event, clicker, this, item);
+        if (event.getWhoClicked() instanceof Player) {
+            Player clicker = (Player) event.getWhoClicked();
+            Item item = items().get(event.getSlot());
+            ActionContext ctx = new ActionContext(event.getClick(), event, clicker, this, item);
 
-        controller.onClick(ctx);
+            controller.onClick(ctx);
 
-        if (item != null && !ctx.isCancelled())
-            item.action().ifPresent(action -> action.execute(ctx));
+            if (!ctx.isCancelled()) {
+                if (item != null) {
+                    if (item.isFixed())
+                        event.setCancelled(true);
+
+                    item.action().ifPresent(action -> action.execute(ctx));
+                }
+
+                ItemStack before = event.getCurrentItem();
+                ItemStack after = event.getCursor();
+
+                if (isNone(before) && !isNone(after)) {
+                    controller.onItemPlaced(this, event.getSlot(), after);
+                }
+
+                if (isNone(after) && !isNone(before)) {
+                    controller.onItemTaken(this, event.getSlot(), before);
+                }
+            }
+        }
     }
 
     @Override
@@ -106,5 +118,9 @@ public abstract class AbstractWindow implements Window {
     @Override
     public Inventory getInventory() {
         return inventory;
+    }
+
+    private boolean isNone(ItemStack item) {
+        return item == null || item.getType().equals(Material.AIR);
     }
 }

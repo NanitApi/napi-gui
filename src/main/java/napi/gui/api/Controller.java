@@ -2,6 +2,8 @@ package napi.gui.api;
 
 import napi.gui.api.action.ActionContext;
 import org.bukkit.entity.Player;
+import org.bukkit.event.inventory.InventoryEvent;
+import org.bukkit.inventory.ItemStack;
 
 /**
  * Controller handles various inventory events
@@ -41,4 +43,19 @@ public interface Controller {
      */
     default void onClick(ActionContext ctx) { }
 
+    /**
+     * Called when item placed in empty slot of window's inventory
+     * @param window Current window
+     * @param slot Placed slot
+     * @param stack Item that placed in empty slot
+     */
+    default void onItemPlaced(Window window, int slot, ItemStack stack) { }
+
+    /**
+     * Called when item taken from window's inventory
+     * @param window Current window
+     * @param slot Taken item slot
+     * @param stack Item that taken from inventory
+     */
+    default void onItemTaken(Window window, int slot, ItemStack stack) { }
 }

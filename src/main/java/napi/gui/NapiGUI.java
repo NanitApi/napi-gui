@@ -2,7 +2,6 @@ package napi.gui;
 
 import com.google.common.base.Preconditions;
 import napi.gui.api.Controller;
-import napi.gui.api.action.ActionContext;
 import napi.gui.api.item.ItemsList;
 import napi.gui.api.Template;
 import napi.gui.api.Window;
@@ -11,17 +10,13 @@ import napi.gui.window.BaseWindow;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.inventory.ClickType;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.plugin.Plugin;
 
 public final class NapiGUI implements Listener {
 
-    private final Plugin plugin;
-
     public NapiGUI(Plugin plugin) {
-        this.plugin = plugin;
         plugin.getServer()
                 .getPluginManager()
                 .registerEvents(this, plugin);
@@ -64,17 +59,19 @@ public final class NapiGUI implements Listener {
 
     @EventHandler
     public void onInventoryClick(InventoryClickEvent event) {
-        if (event.getWhoClicked() instanceof Player
-                && event.getInventory().getHolder() instanceof Window) {
-            Window window = (Window) event.getInventory().getHolder();
+        if (event.getClickedInventory() != null
+                && event.getClickedInventory().getHolder() instanceof Window) {
+            Window window = (Window) event.getClickedInventory().getHolder();
             window.click(event);
         }
     }
 
     @EventHandler
     public void onInventoryClose(InventoryCloseEvent event) {
-        if (event.getInventory().getHolder() instanceof Window) {
+        if (event.getPlayer() instanceof Player
+                && event.getInventory().getHolder() instanceof Window) {
             Window window = (Window) event.getInventory().getHolder();
+            window.controller().onWindowClosed(window, (Player) event.getPlayer());
         }
     }
 }

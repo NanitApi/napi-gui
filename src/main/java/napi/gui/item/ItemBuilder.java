@@ -11,6 +11,7 @@ public class ItemBuilder {
     private Slot slot;
     private ItemStack stack;
     private Action action;
+    private boolean fixed = true;
 
     public ItemBuilder slot(Slot slot) {
         this.slot = slot;
@@ -27,10 +28,15 @@ public class ItemBuilder {
         return this;
     }
 
+    public ItemBuilder fixed(boolean fixed) {
+        this.fixed = fixed;
+        return this;
+    }
+
     public Item build() {
         Preconditions.checkNotNull(slot, "Item slot cannot be null");
         Preconditions.checkNotNull(stack, "Item stack cannot be null");
-        return new InventoryItem(slot, stack, action);
+        return new InventoryItem(slot, stack, action, fixed);
     }
 
 }
