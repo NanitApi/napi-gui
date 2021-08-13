@@ -81,11 +81,11 @@ public abstract class AbstractWindow implements Window {
                 ItemStack before = event.getCurrentItem();
                 ItemStack after = event.getCursor();
 
-                if (isNone(before) && !isNone(after)) {
+                if (isNone(before) && !isNone(after) && !event.isCancelled()) {
                     controller.onItemPlaced(this, event.getSlot(), after);
                 }
 
-                if (isNone(after) && !isNone(before)) {
+                if (isNone(after) && !isNone(before) && !event.isCancelled()) {
                     controller.onItemTaken(this, event.getSlot(), before);
                 }
             }
