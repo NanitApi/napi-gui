@@ -1,16 +1,18 @@
-package napi.gui.item;
+package napi.gui.serialize;
 
-import org.bukkit.Bukkit;
-import org.bukkit.Color;
-import org.bukkit.DyeColor;
-import org.bukkit.Material;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import napi.gui.api.Colors;
+import napi.gui.item.Skulls;
+import org.bukkit.*;
+import org.bukkit.block.banner.Pattern;
+import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.LeatherArmorMeta;
-import org.bukkit.inventory.meta.PotionMeta;
-import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.inventory.meta.*;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 
@@ -18,8 +20,10 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ItemParser {
 
@@ -36,9 +40,9 @@ public class ItemParser {
 
     public ItemStack parse(Map<String, Object> map) throws Exception {
         Material type = getMaterial(map.get("type"));
-        byte data = (byte) map.getOrDefault("data", 0);
+        byte data = new Integer((int)map.getOrDefault("data", 0)).byteValue();
         int amount = (int) map.getOrDefault("amount", 1);
-        short damage = (short) map.getOrDefault("damage", 0);
+        short damage = new Integer((int) map.getOrDefault("damage", 0)).shortValue();
 
         ItemStack item;
 
@@ -52,10 +56,10 @@ public class ItemParser {
             ItemMeta meta = item.getItemMeta();
 
             if (map.containsKey("name"))
-                meta.setDisplayName(map.get("name").toString());
+                meta.setDisplayName(Colors.of(map.get("name").toString()));
 
             if (map.containsKey("lore"))
-                meta.setLore((List<String>) map.get("lore"));
+                meta.setLore(Colors.ofList((List<String>) map.get("lore")));
 
             if (map.containsKey("enchantments")) {
                 Map<String, Object> enchMap = (Map<String, Object>) map.get("enchantments");
@@ -87,6 +91,12 @@ public class ItemParser {
                 }
             }
 
+            if (map.containsKey("texture") && meta instanceof SkullMeta) {
+                SkullMeta skullMeta = (SkullMeta) meta;
+                String url = map.get("texture").toString();
+                Skulls.setTexture(skullMeta, url);
+            }
+
             if (map.containsKey("color")) {
                 Color color = getColor(map.get("color").toString());
                 if (meta instanceof LeatherArmorMeta){
@@ -107,16 +117,32 @@ public class ItemParser {
                 }
             }
 
-            if (map.containsKey("firework")) {
-                // TODO
+            if (map.containsKey("firework") && meta instanceof FireworkMeta) {
+                FireworkMeta fireworkMeta = (FireworkMeta) meta;
+                Map<String, Object> fmap = (Map<String, Object>) map.get("firework");
+                List<FireworkEffect> effects = getFireworkEffects((List<Object>) map.get("potion"));
+                int power = (int) fmap.getOrDefault("power", 1);
+
+                fireworkMeta.addEffects(effects);
+                fireworkMeta.setPower(power);
             }
 
-            if (map.containsKey("book")) {
-                // TODO
+            if (map.containsKey("book") && meta instanceof BookMeta) {
+                BookMeta bookMeta = (BookMeta) meta;
+                Map<String, Object> bookMap = (Map<String, Object>) map.get("book");
+                String title = Colors.of(bookMap.get("title").toString());
+                String author = Colors.of(bookMap.get("author").toString());
+                List<String> pages = Colors.ofList((List<String>) bookMap.get("pages"));
+
+                bookMeta.setTitle(title);
+                bookMeta.setAuthor(author);
+                bookMeta.setPages(pages);
             }
 
-            if (map.containsKey("banner")) {
-                // TODO
+            if (map.containsKey("banner") && meta instanceof BannerMeta) {
+                BannerMeta bannerMeta = (BannerMeta) meta;
+                List<Pattern> patterns = getBannerData(map.get("banner").toString());
+                bannerMeta.setPatterns(patterns);
             }
 
             meta.setUnbreakable((boolean) map.getOrDefault("unbreakable", false));
@@ -150,6 +176,31 @@ public class ItemParser {
         return DyeColor.valueOf(color).getColor();
     }
 
+    private List<Pattern> getBannerData(String json) {
+        List<Pattern> patterns = new ArrayList<>();
+        JsonObject root = new JsonParser().parse(json).getAsJsonObject();
+        JsonArray patternsArray = root.get("BlockEntityTag").getAsJsonObject()
+                .get("Patterns").getAsJsonArray();
+
+        for (JsonElement element : patternsArray){
+            JsonObject object = element.getAsJsonObject();
+            String pattern = object.get("Pattern").getAsString();
+            byte colorByte = object.get("Color").getAsByte();
+
+            PatternType patternType = PatternType.getByIdentifier(pattern);
+            DyeColor color = DyeColor.getByWoolData(colorByte);
+
+            if (patternType == null)
+                throw new IllegalArgumentException("Cannot serialize banner pattern from JSON");
+            if (color == null)
+                throw new IllegalArgumentException("Cannot serialize banner color from JSON");
+
+            patterns.add(new Pattern(color, patternType));
+        }
+
+        return patterns;
+    }
+
     private List<PotionEffect> getPotionData(List<Object> list) {
         List<PotionEffect> effects = new ArrayList<>();
 
@@ -173,4 +224,42 @@ public class ItemParser {
         return effects;
     }
 
+    private List<FireworkEffect> getFireworkEffects(List<Object> list) {
+        List<FireworkEffect> effects = new LinkedList<>();
+
+        for (Object obj : list) {
+            Map<String, Object> map = (Map<String, Object>) obj;
+            effects.add(getFireworkEffect(map));
+        }
+
+        return effects;
+    }
+
+    private FireworkEffect getFireworkEffect(Map<String, Object> map) {
+        FireworkEffect.Builder builder = FireworkEffect.builder();
+
+        if(map.containsKey("colors")) {
+            List<String> list = (List<String>) map.get("colors");
+            List<Color> colors = list.stream()
+                    .map(this::getColor)
+                    .collect(Collectors.toList());
+            builder.withColor(colors);
+        }
+
+        if(map.containsKey("fade_colors")) {
+            List<String> list = (List<String>) map.get("fadeColors");
+            List<Color> colors = list.stream()
+                    .map(this::getColor)
+                    .collect(Collectors.toList());
+            builder.withFade(colors);
+        }
+
+        if(map.containsKey("trail")) {
+            builder.trail(Boolean.parseBoolean(map.get("trail").toString()));
+        }
+
+        builder.with(FireworkEffect.Type.valueOf(map.get("type").toString().toUpperCase()));
+
+        return builder.build();
+    }
 }

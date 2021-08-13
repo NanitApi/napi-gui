@@ -1,0 +1,7 @@
+item_cake:
+  type: CAKE
+  amount: 5
+  name: "Super cake"
+  lore:
+    - "Lore line 1"
+    - "Lore line 2"

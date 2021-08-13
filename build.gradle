@@ -12,6 +12,7 @@ repositories {
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/' }
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url 'https://oss.sonatype.org/content/repositories/central' }
+    maven { url 'https://libraries.minecraft.net/' }
 }
 
 dependencies {
@@ -19,6 +20,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 
     compileOnly 'org.spigotmc:spigot-api:1.17.1-R0.1-SNAPSHOT'
+    compileOnly 'com.mojang:authlib:1.5.25'
     compileOnly 'com.github.NanitApi:napi-yaml:8a0fd5716d'
 }
 

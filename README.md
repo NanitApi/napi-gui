@@ -1,6 +1,6 @@
 # Bukkit GUI api
 
-This is an MVC framework to build GUI in Bukkit.
+This is simple library to build GUI in Bukkit.
 
 ## Usage
 
@@ -39,7 +39,7 @@ This map can have this values:
 * `potion` - [Map] Potion data.
 * `firework` - [Map] Firework data.
 * `book` - [Map] Book data.
-* `banner` - [Map] Banner data.
+* `banner` - [String] Json banner data.
 
 ### Potion data
 
@@ -54,6 +54,17 @@ Potion data is a list of Map with keys and values:
 
 ### Firework data
 
+* `power` - [Int]. Power of firework.
+* `effects` - [Map list]. List of efects.
+
+Each effect format in list has format:
+
+* `colors` - [Strings list]. Effect colors.
+* `fade_colors` - [Strings list]. Fade effect colors.
+* `trail` - [Bool]. If trail effect enabled.
+
 ### Book data
 
-### Banner data
+* `title` - [String]. Book title.
+* `author` - [String]. Book author.
+* `pages` - [Strings list]. Book pages. Each list element is a new page.

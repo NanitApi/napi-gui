@@ -7,6 +7,7 @@ import napi.gui.api.Template;
 import napi.gui.api.Window;
 import napi.gui.window.BaseTemplate;
 import napi.gui.window.BaseWindow;
+import napi.gui.window.DefaultController;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,6 +21,16 @@ public final class NapiGUI implements Listener {
         plugin.getServer()
                 .getPluginManager()
                 .registerEvents(this, plugin);
+    }
+
+    /**
+     * Create GUI template with empty items list
+     * @param title Menu title
+     * @param rows Inventory rows number
+     * @return Created template
+     */
+    public Template createTemplate(String title, int rows) {
+        return createTemplate(title, rows, new DefaultController(), ItemsList.empty());
     }
 
     /**

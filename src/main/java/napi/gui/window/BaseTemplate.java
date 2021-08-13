@@ -1,5 +1,6 @@
 package napi.gui.window;
 
+import napi.gui.api.Colors;
 import napi.gui.api.Controller;
 import napi.gui.api.item.ItemsList;
 import napi.gui.api.Template;
@@ -12,7 +13,7 @@ public class BaseTemplate implements Template {
     private final ItemsList items;
 
     public BaseTemplate(String title, int rows, Controller controller, ItemsList items) {
-        this.title = title;
+        this.title = Colors.of(title);
         this.rows = rows;
         this.controller = controller;
         this.items = items;

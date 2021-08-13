@@ -8,6 +8,7 @@ version '1.0'
 
 repositories {
     mavenCentral()
+    maven { url 'https://jitpack.io' }
     maven { url 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'}
     maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
     maven { url 'https://oss.sonatype.org/content/repositories/central' }
@@ -18,11 +19,16 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 
     compileOnly 'org.spigotmc:spigot-api:1.17-R0.1-SNAPSHOT'
+    implementation ('com.github.NanitApi:napi-yaml:8a0fd5716d') {
+        exclude group: 'org.yaml'
+        exclude group: 'com.google.inject'
+        exclude group: 'com.google.guava'
+    }
     implementation project(':')
 }
 
 shadowJar {
-
+    minimize()
 }
 
 test {

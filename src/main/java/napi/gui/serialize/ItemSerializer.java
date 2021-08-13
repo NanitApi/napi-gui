@@ -2,7 +2,6 @@ package napi.gui.serialize;
 
 import com.google.common.reflect.TypeToken;
 import napi.configurate.yaml.util.ConfigUtil;
-import napi.gui.item.ItemParser;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
