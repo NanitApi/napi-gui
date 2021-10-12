@@ -51,18 +51,8 @@ public class Main extends JavaPlugin implements Listener {
         }
 
         tmpl.items().add(Items.builder()
-                .slot(Slots.matrix(
-                        "xxxxxxxxx",
-                        "x-------x",
-                        "xxxxxxxxx"
-                ))
-                .stack(new ItemStack(Material.CAKE))
-                .build());
-
-        tmpl.items().add(Items.builder()
                 .slot(Slots.index(11))
                 .stack(loadedItem)
-                .action(ctx -> System.out.println("Clicked on button"))
                 .build());
 
         getServer().getPluginManager().registerEvents(this, this);
