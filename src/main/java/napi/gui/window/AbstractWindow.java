@@ -99,7 +99,7 @@ public abstract class AbstractWindow implements Window {
 
     @Override
     public void redraw(Item item, Player player) {
-        item.slot().apply(index -> setItem(index, item.stack()));
+        item.slot().apply(index -> setItem(index, item.stack(), player));
     }
 
     @Override
@@ -107,11 +107,11 @@ public abstract class AbstractWindow implements Window {
         slot.apply(index -> {
             Item item = items.get(index);
             if (item != null)
-                setItem(index, item.stack());
+                setItem(index, item.stack(), player);
         });
     }
 
-    protected void setItem(int index, ItemStack stack) {
+    protected void setItem(int index, ItemStack stack, Player player) {
         inventory.setItem(index, stack);
     }
 
