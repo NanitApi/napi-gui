@@ -51,7 +51,7 @@ public abstract class AbstractWindow implements Window {
     @Override
     public void open(Player player) {
         controller.onWindowOpen(this, player);
-        redraw();
+        redraw(player);
         player.openInventory(inventory);
         controller.onWindowOpened(this, player);
     }
@@ -93,17 +93,17 @@ public abstract class AbstractWindow implements Window {
     }
 
     @Override
-    public void redraw() {
-        items.forEach(this::redraw);
+    public void redraw(Player player) {
+        items.forEach(item -> redraw(item, player));
     }
 
     @Override
-    public void redraw(Item item) {
+    public void redraw(Item item, Player player) {
         item.slot().apply(index -> redraw(index, item.stack()));
     }
 
     @Override
-    public void redraw(Slot slot) {
+    public void redraw(Slot slot, Player player) {
         slot.apply(index -> {
             Item item = items.get(index);
             if (item != null)

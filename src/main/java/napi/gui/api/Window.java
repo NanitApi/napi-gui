@@ -57,18 +57,18 @@ public interface Window extends InventoryHolder {
     /**
      * Redraw all items
      */
-    void redraw();
+    void redraw(Player player);
 
     /**
      * Redraw item
      * @param item Item instance
      */
-    void redraw(Item item);
+    void redraw(Item item, Player player);
 
     /**
      * Redraw item in specified slot, if it exists
      * @param slot Item's slot
      */
-    void redraw(Slot slot);
+    void redraw(Slot slot, Player player);
 
 }
